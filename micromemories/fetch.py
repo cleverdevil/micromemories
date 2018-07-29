@@ -5,7 +5,7 @@ import mf2py
 
 
 def handle_child(child):
-    full_child = mf2py.parse(url=child['properties']['url'][0])
+    full_child = mf2py.parse(url=child['properties']['url'][0], html_parser='lxml')
     full_child['items'][0]['properties']['url'] = child['properties']['url']
     return dict(full_child['items'][0])
 
@@ -14,7 +14,7 @@ def items_for(url, month=1, day=1, full_content=False):
     month = int(month)
     day = int(day)
 
-    result = mf2py.parse(url=url)
+    result = mf2py.parse(url=url, html_parser='lxml')
 
     # check for any found items
     items = result.get('items', [])
