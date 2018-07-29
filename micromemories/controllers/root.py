@@ -77,16 +77,17 @@ class RootController(HookController):
         return dict()
 
     @expose('json')
-    def posts(self, month=None, day=None, tz='US/Pacific'):
-        referer = request.headers.get('Referer')
-        if not referer:
-            return []
+    def posts(self, month=None, day=None, tz='US/Pacific', url=None):
+        if url is None:
+            referer = request.headers.get('Referer')
+            if not referer:
+                return []
 
-        referer = urlparse(referer)
-        url = '%s://%s/archive' % (
-            referer.scheme,
-            referer.netloc
-        )
+            referer = urlparse(referer)
+            url = '%s://%s/archive' % (
+                referer.scheme,
+                referer.netloc
+            )
 
         print('Fetching ->', url)
 

@@ -1,6 +1,13 @@
 from dateutil.parser import parse as parse_dt
+from concurrent import futures
 
 import mf2py
+
+
+def handle_child(child):
+    full_child = mf2py.parse(url=child['properties']['url'][0])
+    full_child['items'][0]['properties']['url'] = child['properties']['url']
+    return dict(full_child['items'][0])
 
 
 def items_for(url, month=1, day=1, full_content=False):
@@ -29,10 +36,14 @@ def items_for(url, month=1, day=1, full_content=False):
         published = parse_dt(published[0])
 
         if (published.month == month and published.day == day):
-            if full_content:
-                full_child = mf2py.parse(url=child['properties']['url'][0])
-                full_child['items'][0]['properties']['url'] = child['properties']['url']
-                child = full_child['items'][0]
-            results.append(child)
+            results.append(dict(child))
+
+    # if we are to fetch full content, handle that in multiple
+    # threads to speed things up
+    if full_content:
+        with futures.ThreadPoolExecutor() as executor:
+            full_results = executor.map(handle_child, results)
+
+        return list(full_results)
 
     return results
