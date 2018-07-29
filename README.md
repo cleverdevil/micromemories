@@ -13,11 +13,16 @@ content:
   Loading...
 </div>
 
-<script src="https://micromemories.cleverdevil.io/js"></script>
+<script src="https://micromemories.cleverdevil.io/js?tz=US/Pacific"></script>
 ```
 
 This will inject some JavaScript into the page, which will then discover and
 crawl your `/archive` page, and populate the content for you.
+
+Make sure to pass the appropriate time zone. If none is specified in the request
+for the JavaScript, then 'US/Pacific' will be assumed. For a full listing of
+available time zone strings, refer to [the IANA time zone
+database](https://www.iana.org/time-zones).
 
 Note: this is still relatively experimental, and has some assumptions baked in
 that need to be made configurable on a per-website basis.

@@ -46,7 +46,7 @@ function renderPost(post) {
 
 var xhr = new XMLHttpRequest();
 xhr.responseType = "json";
-xhr.open('GET', "https://micromemories.cleverdevil.io/posts", true);
+xhr.open('GET', "https://micromemories.cleverdevil.io/posts?tz=%(timezone)s", true);
 xhr.send();
 
 xhr.onreadystatechange = function(e) {
@@ -102,8 +102,8 @@ class RootController(HookController):
         return items
 
     @expose(content_type='application/javascript')
-    def js(self):
-       return JAVASCRIPT
+    def js(self, tz='US/Pacific'):
+        return JAVASCRIPT % {'timezone': tz}
 
     @expose('error.html')
     def error(self, status):
