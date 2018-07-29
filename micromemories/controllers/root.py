@@ -46,7 +46,7 @@ function renderPost(post) {
 
 var xhr = new XMLHttpRequest();
 xhr.responseType = "json";
-xhr.open('GET', "https://fcapiz3yy3.execute-api.us-east-1.amazonaws.com/dev/posts", true);
+xhr.open('GET', "https://micromemories.cleverdevil.io/posts", true);
 xhr.send();
 
 xhr.onreadystatechange = function(e) {
