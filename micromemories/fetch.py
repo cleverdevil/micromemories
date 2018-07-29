@@ -36,10 +36,3 @@ def items_for(url, month=1, day=1, full_content=False):
             results.append(child)
 
     return results
-
-
-#results = get_items_for('http://cleverangel.org/archive', month=8, day=19, full_content=True)
-#
-#
-#import json
-#print(json.dumps(results, indent=2))
