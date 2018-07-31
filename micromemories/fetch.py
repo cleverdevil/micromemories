@@ -1,7 +1,9 @@
 from dateutil.parser import parse as parse_dt
 from concurrent import futures
 
+import json
 import mf2py
+import re
 
 
 def handle_child(child):
@@ -10,11 +12,35 @@ def handle_child(child):
     return dict(full_child['items'][0])
 
 
-def items_for(url, month=1, day=1, full_content=False):
-    month = int(month)
-    day = int(day)
+def handle_child_json(child):
+    full_child = mf2py.parse(url=child['url'], html_parser='lxml')
+    result = full_child['items'][0]
+    result['properties']['url'] = [child['url']]
+    return result
 
-    result = mf2py.parse(url=url, html_parser='lxml')
+
+def json_items_for(content, month=1, day=1, full_content=False):
+    feed = json.loads(content)
+    matching_date = re.compile(r'\d\d\d\d-%.2d-%.2d.*' % (month, day))
+
+    results = []
+    for child in feed.get('items', []):
+        if matching_date.match(child['date_published']):
+            results.append(child)
+
+    # if we are to fetch full content, handle that in multiple
+    # threads to speed things up
+    if full_content:
+        with futures.ThreadPoolExecutor() as executor:
+            full_results = executor.map(handle_child_json, results)
+
+        results = list(full_results)
+
+    return results
+
+
+def items_for(content, month=1, day=1, full_content=False):
+    result = mf2py.parse(content, html_parser='lxml')
 
     # check for any found items
     items = result.get('items', [])
@@ -44,6 +70,6 @@ def items_for(url, month=1, day=1, full_content=False):
         with futures.ThreadPoolExecutor() as executor:
             full_results = executor.map(handle_child, results)
 
-        return list(full_results)
+        results = list(full_results)
 
     return results

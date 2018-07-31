@@ -6,7 +6,9 @@ from urllib.parse import urlparse
 
 from .. import fetch
 
+import time
 import pytz
+import requests
 
 
 JAVASCRIPT = '''var container = document.getElementById('on-this-day');
@@ -78,26 +80,50 @@ class RootController(HookController):
 
     @expose('json')
     def posts(self, month=None, day=None, tz='US/Pacific', url=None):
-        if url is None:
-            referer = request.headers.get('Referer')
-            if not referer:
-                return []
-
-            referer = urlparse(referer)
-            url = '%s://%s/archive' % (
-                referer.scheme,
-                referer.netloc
-            )
-
-        print('Fetching ->', url)
-
         if not month:
             today = pytz.utc.localize(datetime.utcnow())
             today = today.astimezone(pytz.timezone(tz))
             month = today.month
             day = today.day
 
-        items = fetch.items_for(url, month=month, day=day, full_content=True)
+        if url is None:
+            referer = request.headers.get('Referer')
+            if not referer:
+                return []
+
+            referer = urlparse(referer)
+            url = '%s://%s/archive/index.json' % (
+                referer.scheme,
+                referer.netloc
+            )
+
+            print('Discovery -> Fetching ->', url)
+            response = requests.get(url)
+            if response.status_code == 404:
+                url = url.replace('/index.json', '')
+                print('Discovery -> Fetching ->', url)
+                response = requests.get(url)
+        else:
+            print('Fetching ->', url)
+            response = requests.get(url)
+
+        response.encoding = 'utf-8'
+        content = response.text
+
+        if response.headers['Content-Type'] == 'application/json':
+            items = fetch.json_items_for(
+                content=content,
+                month=int(month),
+                day=int(day),
+                full_content=True
+            )
+        else:
+            items = fetch.items_for(
+                content=content,
+                month=int(month),
+                day=int(day),
+                full_content=True
+            )
 
         return items
 
