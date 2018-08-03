@@ -46,6 +46,12 @@ function renderPost(post) {
     postEl.appendChild(contentEl);
 }
 
+function renderNoContent() {
+    var noPostsEl = document.createElement('p');
+    noPostsEl.innerText = 'No posts found for this day. Check back tomorrow!';
+    container.appendChild(noPostsEl);
+}
+
 var xhr = new XMLHttpRequest();
 xhr.responseType = "json";
 xhr.open('GET', "https://micromemories.cleverdevil.io/posts?tz=%(timezone)s", true);
@@ -54,9 +60,13 @@ xhr.send();
 xhr.onreadystatechange = function(e) {
     if (xhr.readyState == 4 && xhr.status == 200) {
         container.innerHTML = '';
-        xhr.response.forEach(function(post) {
-            renderPost(post);
-        });
+        if (xhr.response.length == 0) {
+            renderNoContent();
+        } else {
+            xhr.response.forEach(function(post) {
+                renderPost(post);
+            });
+        }
     }
 }'''
 
@@ -97,12 +107,10 @@ class RootController(HookController):
                 referer.netloc
             )
 
-            print('Discovery -> Fetching ->', url)
+            print('Fetching ->', url)
             response = requests.get(url)
             if response.status_code == 404:
-                url = url.replace('/index.json', '')
-                print('Discovery -> Fetching ->', url)
-                response = requests.get(url)
+                return []
         else:
             print('Fetching ->', url)
             response = requests.get(url)
@@ -110,20 +118,15 @@ class RootController(HookController):
         response.encoding = 'utf-8'
         content = response.text
 
-        if response.headers['Content-Type'] == 'application/json':
-            items = fetch.json_items_for(
-                content=content,
-                month=int(month),
-                day=int(day),
-                full_content=True
-            )
-        else:
-            items = fetch.items_for(
-                content=content,
-                month=int(month),
-                day=int(day),
-                full_content=True
-            )
+        if response.headers['Content-Type'] != 'application/json':
+            return []
+
+        items = fetch.items_for(
+            content=content,
+            month=int(month),
+            day=int(day),
+            full_content=True
+        )
 
         return items
 
