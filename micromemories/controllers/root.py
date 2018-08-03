@@ -35,7 +35,7 @@ function renderPost(post) {
     publishedEl.datetime = post['properties']['published'][0];
 
     var published = post['properties']['published'][0];
-    published = new Date(published.slice(0,-5).replace(' ', 'T'));
+    published = new Date(published.slice(0,19).replace(' ', 'T'));
 
     publishedEl.innerText = published.toDateString();
     permalinkEl.appendChild(publishedEl);
