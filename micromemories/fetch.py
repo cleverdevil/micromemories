@@ -7,7 +7,10 @@ import re
 
 def handle_child(child):
     full_child = mf2py.parse(url=child['url'], html_parser='lxml')
-    result = full_child['items'][0]
+    result = [
+        item for item in full_child['items']
+        if item['type'][0] == 'h-entry'
+    ][0]
     result['properties']['url'] = [child['url']]
     return result
 
