@@ -7,12 +7,18 @@ import re
 
 def handle_child(child):
     full_child = mf2py.parse(url=child['url'], html_parser='lxml')
+
     result = [
         item for item in full_child['items']
         if item['type'][0] == 'h-entry'
-    ][0]
-    result['properties']['url'] = [child['url']]
-    return result
+    ]
+
+    if len(result):
+        result = result[0]
+        result['properties']['url'] = [child['url']]
+        return result
+
+    return None
 
 
 def items_for(content, month=1, day=1, full_content=False):
@@ -30,6 +36,9 @@ def items_for(content, month=1, day=1, full_content=False):
         with futures.ThreadPoolExecutor() as executor:
             full_results = executor.map(handle_child, results)
 
-        results = list(full_results)
+        results = [
+           result for result in full_results
+           if result is not None
+        ]
 
     return results

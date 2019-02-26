@@ -118,8 +118,13 @@ class RootController(HookController):
         response.encoding = 'utf-8'
         content = response.text
 
+        print('Got content, now checking headers')
+
         if response.headers['Content-Type'] != 'application/json':
+            print('Response not JSON, returning []')
             return []
+
+        print('Fetching items!')
 
         items = fetch.items_for(
             content=content,
