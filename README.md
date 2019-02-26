@@ -24,5 +24,12 @@ for the JavaScript, then 'US/Pacific' will be assumed. For a full listing of
 available time zone strings, refer to [the IANA time zone
 database](https://www.iana.org/time-zones).
 
-Note: this is still relatively experimental, and has some assumptions baked in
-that need to be made configurable on a per-website basis.
+Requirements
+------------
+
+Micro Memories is known to work on all of the standard themes in Micro.blog. If
+you are using a custom theme, you need to ensure that your theme makes proper
+use of [microformats](http://microformats.org/wiki/microformats2), especially
+the [h-entry](http://microformats.org/wiki/microformats2#h-entry) microformat.
+The [open source Micro.blog themes](https://github.com/microdotblog) are a good
+place to look for guidance.
