@@ -33,3 +33,10 @@ use of [microformats](http://microformats.org/wiki/microformats2), especially
 the [h-entry](http://microformats.org/wiki/microformats2#h-entry) microformat.
 The [open source Micro.blog themes](https://github.com/microdotblog) are a good
 place to look for guidance.
+
+To ensure a good experience, your posts should be marked up with the `h-entry`
+microformat, with a `u-url` property, a `p-name` property, a `dt-published`
+property, and a `e-content` property. To check how your posts parse with a
+microformats2 parser, you can use the tool on
+[microformats.io](https://microformats.io) to verify that all properties are
+being discovered.
